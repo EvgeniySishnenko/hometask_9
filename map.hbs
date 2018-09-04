@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>{{htmlWebpackPlugin.options.title}}</title>
+    <script src="https://vk.com/js/api/openapi.js" type="text/javascript"></script>
+    <script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU" type="text/javascript"></script>
+    <link href="https://fonts.googleapis.com/css?family=Fira+Sans:400,500" rel="stylesheet">
+</head>
+<body>
+<div class="wrapper">
+    <div id="map"></div>
+  <div class="wrapper-popup">
+    <div class="header">
+        <div class="container header-container">
+            <div class="header--icon">
+                <svg width="15" height="15" class="icon-svg" aria-hidden="true" data-prefix="fas" data-icon="map-marker-alt" class="svg-inline--fa fa-map-marker-alt fa-w-12"
+                    role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512">
+                    <path class="icon-svg-path" d="M172.268 501.67C26.97 291.031 0 269.413 0 192 0 85.961 85.961 0 192 0s192 85.961 192 192c0 77.413-26.97 99.031-172.268 309.67-9.535 13.774-29.93 13.773-39.464 0zM192 272c44.183 0 80-35.817 80-80s-35.817-80-80-80-80 35.817-80 80 35.817 80 80 80z"></path>
+                </svg>
+            </div>
+            <div class="header--coordinates"></div>
+            <div class="header--closed">
+                <svg width="20" height="20" class="icon-svg" aria-hidden="true" data-prefix="fas" data-icon="times" class="svg-inline--fa fa-times fa-w-11"
+                    role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 352 512">
+                    <path class="icon-svg-path" d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z"></path>
+                </svg>
+            </div>
+    
+        </div>
+    </div>
+    <div class="result-reviews">
+        <div class="container reviews--container">
+            
+        </div>
+    </div>
+    <div class="form-reviews">
+        <div class="container form-container">
+            <div class="block-title">
+                <h2 class="h2-title">Ваш отзыв</h2>
+            </div>
+            <form class="form">
+                <input type="text" name="formName" id="form-name" placeholder="Ваше имя">
+                <input type="text" name="formPlace" id="form-place" placeholder="Укажите место">
+                <textarea name="formText" id="form-text" placeholder="Поделитесь впечатлениями"></textarea>
+                <div class="form-button">
+                    <button class="button--add-reviews">
+                        <span class="button--add-reviews--span">Добавить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+  </div>   
+</div>
+</body>
+</html>

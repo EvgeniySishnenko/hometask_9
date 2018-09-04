@@ -1,0 +1,17 @@
+<ul>
+  {{#each friends}}
+    <li class="item">
+      <div>{{this.title}}</div>
+      {{#if ../isLeft}}
+        <div class="btn green">Add</div>
+      {{else}}
+        <div class="btn red">Delete</div>
+      {{/if}}
+      <ul>
+        {{#each this.arr}}
+          <li>{{this}}</li>
+        {{/each}}
+      </ul>
+    </li>
+  {{/each}}
+</ul>

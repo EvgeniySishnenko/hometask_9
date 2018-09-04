@@ -1,0 +1,221 @@
+body {
+    font-family: 'Fira Sans', sans-serif;
+}
+ul, li, input {
+  vertical-align: baseline; 
+  font-family: inherit; 
+  font-weight: inherit; 
+  font-style: inherit; 
+  font-size: 100%; 
+  outline: 0; 
+  padding: 0; 
+  margin: 0; 
+  border: 0;
+  list-style: none;
+}
+input::-moz-focus-inner,
+button::-moz-focus-inner {
+    border: 0;
+    padding: 0;
+}
+button {
+    background: none;
+    border: 0;
+    color: inherit;
+    /* cursor: default; */
+    font: inherit;
+    line-height: normal;
+    overflow: visible;
+    padding: 0;
+    -webkit-appearance: button; /* for input */
+    -webkit-user-select: none; /* for button */
+       -moz-user-select: none;
+        -ms-user-select: none;
+
+     &:focus {
+        outline: 0;
+        outline-offset: 0;
+        }
+    
+}
+textarea {
+    &:focus {
+        outline: 0;
+        outline-offset: 0;
+        }
+}
+.wrapper {
+    width: 100%;
+    height: 100vh;
+    position: relative;
+}
+#map {
+    width: 100%;
+    height: 100%;
+}
+.wrapper-popup {
+    position: absolute;
+    top: 30%;
+    left: 30%;
+    width: 380px;
+    height: 595px;
+    border-radius: 10px;
+    background-color: #fff;
+    display: none;
+}
+.header {
+    width: 100%;
+    height: 45px;
+    background-color: #ff8663;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+.container {
+    width: 350px;
+    height: auto;
+    margin: 0 auto;
+}
+.header-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 45px;
+}
+.header--coordinates {
+    width: 315px;
+    font-size: 12px;
+    color: rgb(255, 255, 255);
+    padding-left: 5px
+}
+.header--icon {
+    width: 15px;
+}
+.header--closed {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+.icon-svg {
+    fill: #fff;
+}
+.result-reviews {
+    width: 100%;
+    height: 150px;
+    overflow: auto;
+     &::-webkit-scrollbar {
+    width: 7px;
+    height: 20px;
+    }
+    
+    &::-webkit-scrollbar-track-piece  {
+    background-color: #fff;
+    -webkit-border-radius: 5px;
+    }
+    
+    &::-webkit-scrollbar-thumb:vertical {
+    height: 100px;
+    background-color: #c4c4c4;
+    border: 1px solid #c4c4c4;
+    -webkit-border-radius: 6px;
+    }
+}
+.reviews-list {
+    width: 100%;
+    height: auto;
+    margin-top: 20px;
+}
+.reviews-item {
+    width: 100%;
+    height: auto;
+    margin-top: 30px;
+
+    &:first-child {
+        margin-top: 0;
+    }
+}
+.reviews-name {
+    font-size: 16px;
+    color: rgb(79, 79, 79);
+    font-weight: 500;
+}
+.reviews-place,
+.reviews-date {
+    font-size: 16px;
+    color: rgba(79, 79, 79, 0.749);
+}
+.reviews-text {
+    font-size: 15px;
+    color: rgb(79, 79, 79);
+    font-weight: 400;
+    margin-top: 10px;
+}
+.form-reviews {
+    margin-top: 30px;
+}
+.form-container {
+    border-top: 1px solid #f0f0f0;
+}
+.h2-title {
+    font-size: 18px;
+    color: rgb(255, 134, 99);
+    text-transform: uppercase;
+    line-height: 0.8;
+    font-weight: 500;
+}
+.form {
+    width: 100%;
+    height: auto;
+}
+#form-name,
+#form-place {
+    width: 335px;
+    height: 35px;
+    margin-top: 15px;
+    border: 1px solid #c4c4c4;
+    border-radius: 40px;
+     &[placeholder] {
+         padding-left: 15px;
+         font-size: 15px;
+         color: rgb(159, 159, 159);
+     }
+}
+#form-text {
+    border: 1px solid #c4c4c4;
+    margin-top: 15px;
+    width: 335px;
+    height: 130px;
+    border-radius: 12px;
+     resize: none;
+    &[placeholder] {
+         padding-left: 15px;
+         font-size: 15px;
+         color: rgb(159, 159, 159);
+         font-family: 'Fira Sans', sans-serif;
+     }
+}
+.form-button {
+    width: 100%;
+    text-align: right;
+    margin-top: 20px;  
+}
+.button--add-reviews {
+    display: inline-block;
+    vertical-align: top;
+    margin: 0;
+    padding: 0;
+    text-align: left;
+    width: 90px;
+    height: 30px;
+    background-color: #ff8663;
+    border-radius: 10px;
+    position: relative;
+}
+.button--add-reviews--span {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 12px;
+    color: rgb(255, 255, 255);
+    cursor: pointer;
+}
