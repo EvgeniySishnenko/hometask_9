@@ -32,7 +32,7 @@ function init() {
         // Получение координат щелчка
 
         var coords = e.get('coords');
-       
+        placemark = e.get('target');
         placemark = new ymaps.Placemark(coords, {
             // Хинт показывается при наведении мышкой на иконку метки.
             hintContent: 'Содержимое всплывающей подсказки',
@@ -41,7 +41,7 @@ function init() {
         });
 
         myMap.geoObjects.add(placemark);
-
+        
     });
 
     myMap.geoObjects.events.add('click', async (e) => {
@@ -118,9 +118,10 @@ button.addEventListener('click', (e) => {
         arrReviews.push(obj); // это мой объкт держу его на всякий случай
 
         // заношу в placemark данные
-        placemark.properties.set('id', Date.now())
-        placemark.properties.set('type', 'placemark')
-        placemark.properties.set('address', address)
+
+        placemark.properties.set('id', Date.now());
+        placemark.properties.set('type', 'placemark');
+        placemark.properties.set('address', address);
 
         const oldReviews = placemark.properties.get('obj')
             ? placemark.properties.get('obj') : [];
