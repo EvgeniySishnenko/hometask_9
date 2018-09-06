@@ -1,0 +1,14 @@
+<ul class="slider--list">
+    {{#each slider}}
+    <li class="slider-item showing">
+        <div class="slider-item--container">
+            <div class="slider-item--place">{{place}}</div>
+            <div class="slider-item--address">
+                <a class="slider-item--link" href="#">{{address}}</a>
+            </div>
+            <div class="slider-item--reviews">{{reviews}}</div>
+            <div class="slider-item--date">{{date}}</div>
+        </div>
+    </li>
+    {{/each}}
+</ul>

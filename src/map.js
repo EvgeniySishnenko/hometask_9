@@ -1,5 +1,8 @@
 import './style/style.scss';
+import './style/slider.scss';
+import './slider.js';
 import render from '../map-reviews.hbs';
+import renderSlider from '../map-slider.hbs';
 
 ymaps.ready(init);
 
@@ -15,7 +18,7 @@ let address;
 let coords;
 function init() {
     // Создание карты.    
-    var myMap = new ymaps.Map("map", {
+    let myMap = new ymaps.Map("map", {
         // Координаты центра карты.
         // Порядок по умолчнию: «широта, долгота».
         // Чтобы не определять координаты центра карты вручную,
@@ -24,30 +27,53 @@ function init() {
         // Уровень масштабирования. Допустимые значения:
         // от 0 (весь мир) до 19.
         zoom: 15,
-        controls: [],
+        controls: []
+        
+    }),
+    clusterer = new ymaps.Clusterer({
+        /**
+          * Через кластеризатор можно указать только стили кластеров,
+          * стили для меток нужно назначать каждой метке отдельно.
+          * @see https://api.yandex.ru/maps/doc/jsapi/2.1/ref/reference/option.presetStorage.xml
+          */
+        preset: 'islands#invertedVioletClusterIcons',
+        /**
+         * Ставим true, если хотим кластеризовать только точки с одинаковыми координатами.
+         */
+        groupByCoordinates: false,
+        /**
+         * Опции кластеров указываем в кластеризаторе с префиксом "cluster".
+         * @see https://api.yandex.ru/maps/doc/jsapi/2.1/ref/reference/ClusterPlacemark.xml
+         */
+        clusterDisableClickZoom: true,
+        clusterHideIconOnBalloonOpen: false,
+        geoObjectHideIconOnBalloonOpen: false
     });
-    
+    myMap.geoObjects.add(clusterer);
 
     myMap.events.add('click', function (e) {
         // Получение координат щелчка
 
         var coords = e.get('coords');
-        placemark = e.get('target');
+       
         placemark = new ymaps.Placemark(coords, {
             // Хинт показывается при наведении мышкой на иконку метки.
-            hintContent: 'Содержимое всплывающей подсказки',
+            //hintContent: 'Содержимое всплывающей подсказки',
             // Балун откроется при клике по метке.
-            balloonContent: 'Содержимое балуна'
+            //balloonContent: 'Содержимое балуна'
         });
 
         myMap.geoObjects.add(placemark);
+
         
     });
 
     myMap.geoObjects.events.add('click', async (e) => {
+
         popup.style.display = 'block';
         coords = e.get('coords');
-
+        
+        placemark = e.get('target');
         // получаем адрес  ипереводим из долготы и широты в дом, улица, город
         const response = await ymaps.geocode(coords);
         address = response.geoObjects.get(0).getAddressLine();
@@ -55,11 +81,46 @@ function init() {
         
         coordinates.innerHTML = '';
         coordinates.innerHTML = address; // добавляем адрес  в шапку 
+        let obj = {// создаем объект
+            name: '',
+            place: '',
+            reviews: '',
+            date: ''
+        };
+        placemark.properties.set('id', Date.now());
+        placemark.properties.set('type', 'placemark');
+        placemark.properties.set('address', address);
 
+        const oldReviews = placemark.properties.get('obj')
+            ? placemark.properties.get('obj') : [];
+        placemark.properties.set('obj', oldReviews);
+        oldReviews.push(obj);
         addReviews(oldReviews); // отрисовываем отзывы при клике на маркер
+        clusterer.add(placemark);
+    
         
-    });  
-}
+    }); 
+
+    // попытка открыть кластер
+    clusterer.options.set({
+
+        // clusterBalloonLayout: ymaps.templateLayoutFactory.createClass(""),
+
+        clusterBalloonShadow: false
+
+    });
+
+    myMap.balloon.events.add('open', function (event) {
+
+        const containerSlider = document.querySelector('.slider--wrapper');
+        containerSlider.style.display = 'block';
+        popup.style.display = 'none';
+
+    });
+
+   
+}// не трогать
+
 
 closed.addEventListener('click', () => {
     popup.style.display = 'none';
@@ -101,7 +162,8 @@ button.addEventListener('click', (e) => {
             name: '',
             place: '',
             reviews: '',
-            date: ''
+            date: '',
+            address: ''
         };
         // получем дату
         let d = new Date();
@@ -114,11 +176,10 @@ button.addEventListener('click', (e) => {
         obj.place = form.elements.formPlace.value;
         obj.reviews = form.elements.formText.value;
         obj.date = `${currDate}.${currMonth}.${currYear}`;
-    
+        obj.address = address;
         arrReviews.push(obj); // это мой объкт держу его на всякий случай
 
         // заношу в placemark данные
-
         placemark.properties.set('id', Date.now());
         placemark.properties.set('type', 'placemark');
         placemark.properties.set('address', address);
@@ -127,13 +188,15 @@ button.addEventListener('click', (e) => {
             ? placemark.properties.get('obj') : [];
         placemark.properties.set('obj', oldReviews);
         oldReviews.push(obj);
+      
         // очищаю поля формы
         form.elements.formName.value = '';
         form.elements.formPlace.value = '';
         form.elements.formText.value = '';
 
-
+        addSlider(oldReviews);
         addReviews(oldReviews);
+        console.log(oldReviews);
        
     }
 });
@@ -143,4 +206,13 @@ function addReviews (array) {
     const result = document.querySelector('.reviews--container');
         result.innerHTML = '';
         result.innerHTML = mapHTML;
+}
+
+function addSlider (array) {
+    let sliderHTML = renderSlider({ slider: array });
+    const result = document.querySelector('.slider');
+   
+    result.innerHTML = '';
+    result.innerHTML = sliderHTML;
+   
 }
