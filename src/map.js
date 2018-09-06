@@ -1,8 +1,10 @@
+import render from '../map-reviews.hbs';
+import renderSlider from '../map-slider.hbs';
 import './style/style.scss';
 import './style/slider.scss';
 import './slider.js';
-import render from '../map-reviews.hbs';
-import renderSlider from '../map-slider.hbs';
+import './movie.js'
+
 
 ymaps.ready(init);
 
@@ -10,12 +12,13 @@ const popup = document.querySelector('.wrapper-popup'),
     closed = document.querySelector('.header--closed'),
     button = document.querySelector('.button--add-reviews'),
     form = document.querySelector('.form');
+let arrReviews = [],
+    oldReviews = [],
+    reviews = {},
+    placemark,
+    address,
+    coords;
 
-let arrReviews = [];
-let oldReviews = [];
-let placemark;
-let address;
-let coords;
 function init() {
     // Создание карты.    
     let myMap = new ymaps.Map("map", {
@@ -62,43 +65,36 @@ function init() {
             // Балун откроется при клике по метке.
             //balloonContent: 'Содержимое балуна'
         });
-
+       
         myMap.geoObjects.add(placemark);
-
-        
-    });
-
-    myMap.geoObjects.events.add('click', async (e) => {
-
-        popup.style.display = 'block';
-        coords = e.get('coords');
-        
-        placemark = e.get('target');
-        // получаем адрес  ипереводим из долготы и широты в дом, улица, город
-        const response = await ymaps.geocode(coords);
-        address = response.geoObjects.get(0).getAddressLine();
-        const coordinates = document.querySelector('.header--coordinates');
-        
-        coordinates.innerHTML = '';
-        coordinates.innerHTML = address; // добавляем адрес  в шапку 
-        let obj = {// создаем объект
-            name: '',
-            place: '',
-            reviews: '',
-            date: ''
-        };
-        placemark.properties.set('id', Date.now());
         placemark.properties.set('type', 'placemark');
-        placemark.properties.set('address', address);
-
-        const oldReviews = placemark.properties.get('obj')
-            ? placemark.properties.get('obj') : [];
-        placemark.properties.set('obj', oldReviews);
-        oldReviews.push(obj);
-        addReviews(oldReviews); // отрисовываем отзывы при клике на маркер
         clusterer.add(placemark);
-    
+    });
+   
+    myMap.geoObjects.events.add('click', async (e) => {
+        const target = e.get('target');
         
+        if (target.properties.get('type') === 'placemark') {
+            popup.style.display = 'block';
+            coords = e.get('coords');
+
+            placemark = e.get('target');
+            // получаем адрес  ипереводим из долготы и широты в дом, улица, город
+            const response = await ymaps.geocode(coords);
+            address = response.geoObjects.get(0).getAddressLine();
+            const coordinates = document.querySelector('.header--coordinates');
+
+            coordinates.innerHTML = '';
+            coordinates.innerHTML = address; // добавляем адрес  в шапку 
+
+            oldReviews = placemark.properties.get('reviews')
+                ? placemark.properties.get('reviews') : [];
+
+            placemark.properties.set('reviews', oldReviews);
+            addReviews(oldReviews); // отрисовываем отзывы при клике на маркер
+            clusterer.add(placemark);
+        
+        }
     }); 
 
     // попытка открыть кластер
@@ -107,6 +103,7 @@ function init() {
         // clusterBalloonLayout: ymaps.templateLayoutFactory.createClass(""),
 
         clusterBalloonShadow: false
+        // hasBalloon: false
 
     });
 
@@ -114,9 +111,9 @@ function init() {
 
         const containerSlider = document.querySelector('.slider--wrapper');
         containerSlider.style.display = 'block';
-        popup.style.display = 'none';
-
+        addSlider(arrReviews);
     });
+
 
    
 }// не трогать
@@ -158,13 +155,7 @@ button.addEventListener('click', (e) => {
     }
  // если нет ошибок ...
     if (error != false) { 
-        let obj = {// создаем объект
-            name: '',
-            place: '',
-            reviews: '',
-            date: '',
-            address: ''
-        };
+        let reviews = {};
         // получем дату
         let d = new Date();
         let currDate = d.getDate();
@@ -172,32 +163,31 @@ button.addEventListener('click', (e) => {
         let currYear = d.getFullYear();
        
         // добавляем в объкт
-        obj.name = form.elements.formName.value;
-        obj.place = form.elements.formPlace.value;
-        obj.reviews = form.elements.formText.value;
-        obj.date = `${currDate}.${currMonth}.${currYear}`;
-        obj.address = address;
-        arrReviews.push(obj); // это мой объкт держу его на всякий случай
+        
+        reviews.name = form.elements.formName.value;
+        reviews.place = form.elements.formPlace.value;
+        reviews.reviews = form.elements.formText.value;
+        reviews.date = `${currDate}.${currMonth}.${currYear}`;
+        reviews.address = address;
+        reviews.id = Date.now();
+        reviews.type = 'placemark';
+        arrReviews.push(reviews); // это мой объкт держу его на всякий случай
 
         // заношу в placemark данные
         placemark.properties.set('id', Date.now());
         placemark.properties.set('type', 'placemark');
         placemark.properties.set('address', address);
 
-        const oldReviews = placemark.properties.get('obj')
-            ? placemark.properties.get('obj') : [];
-        placemark.properties.set('obj', oldReviews);
-        oldReviews.push(obj);
-      
+        oldReviews = placemark.properties.get('reviews')
+            ? placemark.properties.get('reviews') : [];
+        oldReviews.push(reviews);
+        placemark.properties.set('reviews', oldReviews);
         // очищаю поля формы
         form.elements.formName.value = '';
         form.elements.formPlace.value = '';
         form.elements.formText.value = '';
 
-        addSlider(oldReviews);
         addReviews(oldReviews);
-        console.log(oldReviews);
-       
     }
 });
 // функци отрисовки отзывов
@@ -216,3 +206,13 @@ function addSlider (array) {
     result.innerHTML = sliderHTML;
    
 }
+// function mouseMovie () {
+//     document.querySelector('.wrapper').onmousemove = function (event) {
+//         event = event || window.event;
+//         let offX = event.offsetX;
+//         let offY = event.offsetY;
+//         console.log(offX);
+//         console.log(offY);
+//     }
+// }
+// mouseMovie();
