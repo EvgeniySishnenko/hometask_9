@@ -11,14 +11,15 @@ ymaps.ready(init);
 const popup = document.querySelector('.wrapper-popup'),
     closed = document.querySelector('.header--closed'),
     button = document.querySelector('.button--add-reviews'),
-    form = document.querySelector('.form');
+    form = document.querySelector('.form'),
+    wrapper = document.querySelector('.wrapper');
 let arrReviews = [],
     oldReviews = [],
     reviews = {},
     placemark,
     address,
     coords;
-
+let hasItemNumber = true;
 function init() {
     // Создание карты.    
     let myMap = new ymaps.Map("map", {
@@ -76,6 +77,8 @@ function init() {
         
         if (target.properties.get('type') === 'placemark') {
             popup.style.display = 'block';
+            mouseMoviePopup();
+
             coords = e.get('coords');
 
             placemark = e.get('target');
@@ -97,7 +100,7 @@ function init() {
         }
     }); 
 
-    // попытка открыть кластер
+    //попытка открыть кластер
     clusterer.options.set({
 
         // clusterBalloonLayout: ymaps.templateLayoutFactory.createClass(""),
@@ -108,16 +111,77 @@ function init() {
     });
 
     myMap.balloon.events.add('open', function (event) {
-
         const containerSlider = document.querySelector('.slider--wrapper');
         containerSlider.style.display = 'block';
+        let properties;
+       
         addSlider(arrReviews);
-    });
+        mouseMovieSlider(containerSlider);
+        generateNumberControl();
+    }); 
 
-
-   
 }// не трогать
+function generateNumberControl() {
+    let num = 0;
+    const slides = document.querySelectorAll('.slider-item');
+    const numberList = document.querySelector('.slider-numbers--list');
+    numberList.innerHTML = '';
+    for (let i = 0; i < slides.length; i++) {
+        num++;
+        const li = document.createElement('li');
+        const div = document.createElement('div');
 
+        div.className = 'slider-numbers--count';
+        div.setAttribute('attr', num);
+        li.setAttribute('data-attr', num);
+        li.id = 'num' + num;
+        li.className = 'slider-numbers--item';
+        numberList.appendChild(li);
+        li.appendChild(div);
+        div.innerText = num;
+    }
+}
+function mouseMovieSlider(containerSlider) {
+    event = event || window.event;
+    let offY = event.offsetY;
+    let offX = event.offsetX;
+    containerSlider.style.left = offX - 40 + 'px';
+    containerSlider.style.top = offY - 250 + 'px';
+
+    // console.log(offX);
+    // console.log(offY);
+    // console.log(containerSlider.style.left = offX - 40 + 'px');
+    // console.log(containerSlider.style.top = offY - 260 + 'px');
+
+}
+function mouseMoviePopup() {
+
+    let width = wrapper.offsetWidth;
+    let height = wrapper.offsetHeight;
+    let heightPopup = popup.offsetHeight;
+    let widthPopup = popup.offsetWidth;
+
+    event = event || window.event;
+    let offY = event.offsetY;
+    let offX = event.offsetX;
+
+    let a = height - offY;
+    let b = width - offX;
+    if (a < heightPopup) {
+        let c = height- heightPopup;
+        popup.style.top = c - 15 + 'px';
+        popup.style.left = offX + 10 + 'px';
+    } 
+    if (b < widthPopup) {
+        let c = width - widthPopup - b - 20;
+        popup.style.left = c + 'px';  
+    }
+    if (a > heightPopup && b > widthPopup) {
+        popup.style.left = offX + 10 + 'px';
+        popup.style.top = offY + 'px';
+    }
+   
+} 
 
 closed.addEventListener('click', () => {
     popup.style.display = 'none';
@@ -206,13 +270,21 @@ function addSlider (array) {
     result.innerHTML = sliderHTML;
    
 }
-// function mouseMovie () {
-//     document.querySelector('.wrapper').onmousemove = function (event) {
-//         event = event || window.event;
-//         let offX = event.offsetX;
-//         let offY = event.offsetY;
-//         console.log(offX);
-//         console.log(offY);
-//     }
-// }
-// mouseMovie();
+
+// обработчик клика по ссылке в слайдере 
+
+const slider = document.querySelector('.slider');
+slider.addEventListener('click', (e) => {
+    e.preventDefault();
+    if (e.target.classList.contains('slider-item--link')) {
+        popup.style.display = 'block';
+        const id = e.target.getAttribute('attr');
+        const oneReviews = arrReviews.find(items => items.id == Number(id));
+        addReviews(oneReviews);
+        // coordinates = document.querySelector('.header--coordinates');
+        coordinates.innerHTML = '';
+        coordinates.innerHTML = oneReviews.address; // добавляем адрес  в шапку 
+        
+    }
+});
+

@@ -78,40 +78,24 @@ function activeNumber(n) {
     
     }
 
-    // let activeNumber = document.querySelector('#num'+n);
+    let activeNumber = document.querySelector('#num'+n);
 
-    // activeNumber.classList.add('numbers-active');
+    activeNumber.classList.add('numbers-active');
 }
-function generateNumberControl() {
-    let num = 0;
-    const slides = document.querySelectorAll('.slider-item');
 
 
-    console.log(slides);
-
-    for (let i = 0; i < slides.length; i++) {
-        num++;
-        const li = document.createElement('li');
-        const div = document.createElement('div');
-
-        div.className = 'slider-numbers--count';
-        div.setAttribute('attr', num);
-        li.setAttribute('data-attr', num);
-        li.id = 'num' + num;
-        li.className = 'slider-numbers--item';
-        numberList.appendChild(li);
-        li.appendChild(div);
-        div.innerText = num;
-    }
-}
 setupListners();
 
-function numberInit() {
-       
-    if (slides.length !== 0) { 
-        generateNumberControl();
-    }
-}
-if (document.querySelectorAll('.slider-item')) {
-    numberInit();
-}
+// function numberInit() {
+//     return new Promise((resolve) => {
+//         console.log('до if');
+//         console.log(slides);
+//         if (slides.length !== 0) {
+//             console.log(slides);
+//             console.log('внутри if');
+//             resolve();
+//         }
+//     });
+// }
+// numberInit().then(() => console.log('внутри then' + slides));
+
