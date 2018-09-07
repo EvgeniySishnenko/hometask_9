@@ -3,7 +3,6 @@ import renderSlider from '../map-slider.hbs';
 import './style/style.scss';
 import './style/slider.scss';
 import './slider.js';
-import './movie.js'
 
 
 ymaps.ready(init);
@@ -23,35 +22,18 @@ let hasItemNumber = true;
 function init() {
     // Создание карты.    
     let myMap = new ymaps.Map("map", {
-        // Координаты центра карты.
-        // Порядок по умолчнию: «широта, долгота».
-        // Чтобы не определять координаты центра карты вручную,
-        // воспользуйтесь инструментом Определение координат.
         center: [55.76, 37.64],
-        // Уровень масштабирования. Допустимые значения:
-        // от 0 (весь мир) до 19.
         zoom: 15,
         controls: []
         
     }),
     clusterer = new ymaps.Clusterer({
-        /**
-          * Через кластеризатор можно указать только стили кластеров,
-          * стили для меток нужно назначать каждой метке отдельно.
-          * @see https://api.yandex.ru/maps/doc/jsapi/2.1/ref/reference/option.presetStorage.xml
-          */
         preset: 'islands#invertedVioletClusterIcons',
-        /**
-         * Ставим true, если хотим кластеризовать только точки с одинаковыми координатами.
-         */
         groupByCoordinates: false,
-        /**
-         * Опции кластеров указываем в кластеризаторе с префиксом "cluster".
-         * @see https://api.yandex.ru/maps/doc/jsapi/2.1/ref/reference/ClusterPlacemark.xml
-         */
         clusterDisableClickZoom: true,
         clusterHideIconOnBalloonOpen: false,
-        geoObjectHideIconOnBalloonOpen: false
+        geoObjectHideIconOnBalloonOpen: false,
+        hasBalloon: false
     });
     myMap.geoObjects.add(clusterer);
 
@@ -61,10 +43,7 @@ function init() {
         var coords = e.get('coords');
        
         placemark = new ymaps.Placemark(coords, {
-            // Хинт показывается при наведении мышкой на иконку метки.
-            //hintContent: 'Содержимое всплывающей подсказки',
-            // Балун откроется при клике по метке.
-            //balloonContent: 'Содержимое балуна'
+            //
         });
        
         myMap.geoObjects.add(placemark);
@@ -77,7 +56,7 @@ function init() {
         
         if (target.properties.get('type') === 'placemark') {
             popup.style.display = 'block';
-            mouseMoviePopup();
+            mouseMoviePopup(e);
 
             coords = e.get('coords');
 
@@ -97,31 +76,41 @@ function init() {
             addReviews(oldReviews); // отрисовываем отзывы при клике на маркер
             clusterer.add(placemark);
         
+        } else {
+            const containerSlider = document.querySelector('.slider--wrapper');
+            containerSlider.style.display = 'block';
+            
+            const target = e.get('target');
+            const сlusterMarkers = target.properties.get('geoObjects');
+            const sliderReviews = [];
+            for (let i = 0; i < сlusterMarkers.length; i++) {
+                const cur = сlusterMarkers[i];
+                const reviewsArr = cur.properties.get('reviews'); 
+                for (let i = 0; i < reviewsArr.length; i++) {
+                    const address = reviewsArr[i]['address'];
+                    const id = reviewsArr[i]['id'];
+                    const date = reviewsArr[i]['date'];
+                    const place = reviewsArr[i]['place'];
+                    const reviews = reviewsArr[i]['reviews']; 
+                    const obj = {
+                        id: id,
+                        address: address,
+                        date: date,
+                        place: place,
+                        reviews: reviews
+                    }
+                    sliderReviews.push(obj);
+                }
+                
+            }
+            addSlider(sliderReviews);
+            mouseMovieSlider(e);
+            generateNumberControl();
+            addShowing();       
         }
     }); 
-
-    //попытка открыть кластер
-    clusterer.options.set({
-
-        // clusterBalloonLayout: ymaps.templateLayoutFactory.createClass(""),
-
-        clusterBalloonShadow: false
-        // hasBalloon: false
-
-    });
-
-    myMap.balloon.events.add('open', function (event) {
-        const containerSlider = document.querySelector('.slider--wrapper');
-        containerSlider.style.display = 'block';
-        let properties;
-       
-        addSlider(arrReviews);
-        mouseMovieSlider(containerSlider);
-        generateNumberControl();
-        addShowing();
-    }); 
-
-}// не трогать 
+ 
+}
 
 //добавляю класс для первого елемента в слайдере
 function addShowing () {
@@ -150,29 +139,45 @@ function generateNumberControl() {
         div.innerText = num;
     }
 }
-function mouseMovieSlider(containerSlider) {
-    event = event || window.event;
-    let offY = event.offsetY;
-    let offX = event.offsetX;
-    containerSlider.style.left = offX - 40 + 'px';
-    containerSlider.style.top = offY - 250 + 'px';
+function mouseMovieSlider(event) {
+    let width = wrapper.offsetWidth;
+    let height = wrapper.offsetHeight;
+    let slider = document.querySelector('.slider--wrapper');
+    let heightPopup = slider.offsetHeight;
+    let widthPopup = slider.offsetWidth;
 
-    // console.log(offX);
-    // console.log(offY);
-    // console.log(containerSlider.style.left = offX - 40 + 'px');
-    // console.log(containerSlider.style.top = offY - 260 + 'px');
 
+    const screenCoords = event.get('position');
+    const [offX, offY] = screenCoords;
+
+
+    let a = height - offY;
+    let b = width - offX;
+    if (a < heightPopup) {
+        let c = height - heightPopup;
+        slider.style.top = c - 15 + 'px';
+        slider.style.left = offX + 10 + 'px';
+    }
+    if (b < widthPopup) {
+        let c = width - widthPopup - b - 20;
+        slider.style.left = c + 'px';
+    }
+    if (a > heightPopup && b > widthPopup) {
+        slider.style.left = offX + 10 + 'px';
+        slider.style.top = offY + 'px';
+    }
 }
-function mouseMoviePopup() {
+function mouseMoviePopup(event) {
 
     let width = wrapper.offsetWidth;
     let height = wrapper.offsetHeight;
     let heightPopup = popup.offsetHeight;
     let widthPopup = popup.offsetWidth;
 
-    event = event || window.event;
-    let offY = event.offsetY;
-    let offX = event.offsetX;
+  
+    const screenCoords = event.get('position');
+    const [offX, offY] = screenCoords;
+    
 
     let a = height - offY;
     let b = width - offX;
@@ -288,12 +293,13 @@ slider.addEventListener('click', (e) => {
     if (e.target.classList.contains('slider-item--link')) {
         popup.style.display = 'block';
         const id = e.target.getAttribute('attr');
-        const oneReviews = arrReviews.find(items => items.id == Number(id));
-        addReviews(oneReviews);
-        coordinates = document.querySelector('.header--coordinates');
+        let arrayReviews = [];
+        let oneReview = arrReviews.find(items => items.id == Number(id));
+        let coordinates = document.querySelector('.header--coordinates');
+        arrayReviews.push(oneReview);
         coordinates.innerHTML = '';
-        coordinates.innerHTML = oneReviews.address; // добавляем адрес  в шапку 
-        
+        coordinates.innerHTML = oneReview.address; // добавляем адрес  в шапку 
+        addReviews(arrayReviews);
     }
 });
 
