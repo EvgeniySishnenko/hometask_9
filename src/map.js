@@ -118,9 +118,18 @@ function init() {
         addSlider(arrReviews);
         mouseMovieSlider(containerSlider);
         generateNumberControl();
+        addShowing();
     }); 
 
 }// не трогать
+
+//добавляю класс для первого елемента в слайдере
+function addShowing () {
+    const slides = document.querySelector('.slider-item');
+    slides.classList.add('showing');
+    let activeNumber = document.querySelector('#num1');
+    activeNumber.classList.add('numbers-active');
+}
 function generateNumberControl() {
     let num = 0;
     const slides = document.querySelectorAll('.slider-item');
@@ -281,7 +290,7 @@ slider.addEventListener('click', (e) => {
         const id = e.target.getAttribute('attr');
         const oneReviews = arrReviews.find(items => items.id == Number(id));
         addReviews(oneReviews);
-        // coordinates = document.querySelector('.header--coordinates');
+        coordinates = document.querySelector('.header--coordinates');
         coordinates.innerHTML = '';
         coordinates.innerHTML = oneReviews.address; // добавляем адрес  в шапку 
         
